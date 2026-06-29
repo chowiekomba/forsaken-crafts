@@ -1,0 +1,34 @@
+{
+	"schemaVersion": 1,
+	"id": "forsaken-crafts",
+	"version": "${version}",
+	"name": "Forsaken Crafts",
+	"description": "Everything is locked, progress to unlock stuff!",
+	"authors": [
+		"Chowiekomba"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/forsaken-crafts/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"chowie.forsakencrafts.ForsakenCrafts"
+		],
+		"fabric-datagen": [
+			"chowie.forsakencrafts.ForsakenCraftsDataGenerator"
+		]
+	},
+	"mixins": [
+		"forsaken-crafts.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
+}
