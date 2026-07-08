@@ -2,10 +2,12 @@ package chowie.forsakencrafts;
 
 import chowie.forsakencrafts.commands.CommandRegistry;
 import chowie.forsakencrafts.util.ItemDisplayTimer;
+import chowie.forsakencrafts.util.ModConfig;
 import chowie.forsakencrafts.util.ModDataAttachments;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.resources.Identifier;
 
 import org.slf4j.Logger;
@@ -15,6 +17,10 @@ public class ForsakenCrafts implements ModInitializer {
 	public static final String MOD_ID = "forsaken-crafts";
 
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+	public static final ModConfig CONFIG = ModConfig.createToml(
+			FabricLoader.getInstance().getConfigDir(),
+			"","ForsakenCraftsConfig", ModConfig.class);
 
 	@Override
 	public void onInitialize() {

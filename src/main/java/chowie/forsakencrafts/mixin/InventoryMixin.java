@@ -1,5 +1,7 @@
 package chowie.forsakencrafts.mixin;
 
+import chowie.forsakencrafts.ForsakenCrafts;
+import chowie.forsakencrafts.util.ConfigCommandExecuter;
 import chowie.forsakencrafts.util.ItemDisplayTimer;
 import chowie.forsakencrafts.util.ModDataAttachments;
 import net.minecraft.core.Holder;
@@ -48,6 +50,11 @@ public class InventoryMixin {
 					serverPlayer.setAttached(ModDataAttachments.ITEMS_FOUND, itemsFound);
 					serverPlayer.setAttached(ModDataAttachments.ITEMS_UNLOCKED, itemsUnlocked);
 					ItemDisplayTimer.INSTANCE.setTimer(serverPlayer, item, 60);
+
+					if (!ForsakenCrafts.CONFIG.unlockCommand.isEmpty()) {
+						ConfigCommandExecuter.runCommand(serverPlayer.level().getServer(), ForsakenCrafts.CONFIG.unlockCommand,
+								serverPlayer);
+					}
 				}
 			}
 
@@ -55,8 +62,14 @@ public class InventoryMixin {
 				serverPlayer.sendSystemMessage(Component.literal(itemStack.getItemName().getString() +
 						" isn't unlocked yet!"));
 				itemStack.setCount(0);
+
+				if (!ForsakenCrafts.CONFIG.pickUpCommand.isEmpty()) {
+					ConfigCommandExecuter.runCommand(serverPlayer.level().getServer(), ForsakenCrafts.CONFIG.pickUpCommand,
+							serverPlayer);
+				}
                 cir.setReturnValue(false);
 			}
+
 		}
 	}
 
