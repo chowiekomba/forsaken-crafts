@@ -1,8 +1,5 @@
 # Forsaken Crafts
-
-## Setup
-
-
+Adds special restrictions to getting items, adding an extra challenge to the game.
 
 ## License
 

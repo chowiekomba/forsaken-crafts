@@ -1,8 +1,11 @@
 package chowie.forsakencrafts;
 
+import chowie.forsakencrafts.commands.CommandRegistry;
+import chowie.forsakencrafts.util.ItemDisplayTimer;
 import chowie.forsakencrafts.util.ModDataAttachments;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.resources.Identifier;
 
 import org.slf4j.Logger;
@@ -16,7 +19,11 @@ public class ForsakenCrafts implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Registering {}", MOD_ID);
+
 		ModDataAttachments.register();
+		ItemDisplayTimer.register();
+
+		CommandRegistrationCallback.EVENT.register(CommandRegistry::commandRegister);
 	}
 
 	public static Identifier id(String path) {
