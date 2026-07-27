@@ -1,6 +1,7 @@
 package chowie.forsakencrafts.mixin;
 
 import chowie.forsakencrafts.ForsakenCrafts;
+import chowie.forsakencrafts.datagen.ModItemTagProvider;
 import chowie.forsakencrafts.util.ConfigCommandExecuter;
 import chowie.forsakencrafts.util.ItemDisplayTimer;
 import chowie.forsakencrafts.util.ModDataAttachments;
@@ -44,6 +45,9 @@ public class InventoryMixin {
 			if (!itemsFound.contains(itemStack.getItem())) {
 				Optional<Holder.Reference<Item>> randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
 				if (randomItem.isPresent()) {
+					while (randomItem.get().is(ModItemTagProvider.UNOBTAINABLE_ITEMS) && !itemsUnlocked.contains(randomItem.get().value())) {
+						randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
+					}
 					Item item = randomItem.get().value();
 					itemsFound.add(itemStack.getItem());
 					itemsUnlocked.add(item);

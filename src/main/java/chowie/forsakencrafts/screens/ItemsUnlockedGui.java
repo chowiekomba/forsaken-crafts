@@ -30,7 +30,7 @@ public class ItemsUnlockedGui {
         gui.setTitle(Component.literal("Unlocked Items"));
         update();
 
-        if (list.size() > 1) {
+        if (!list.isEmpty()) {
             int slot = 0;
             for (Item item : list.subList(start, end)) {
                 gui.setSlot(slot++, item.getDefaultInstance());
