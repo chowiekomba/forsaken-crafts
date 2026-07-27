@@ -32,6 +32,12 @@ public class ItemDisplayTimer implements ServerTickEvents.EndTick {
         for (PlayerItem playerItem : Set.copyOf(playerMap.keySet())) {
             if (playerMap.put(playerItem, playerMap.getOrDefault(playerItem, 0) - 1) instanceof Integer i) {
                 ServerPlayer player = playerItem.player();
+
+                if (server.getPlayerList().getPlayer(player.getUUID()) == null) {
+                    playerMap.remove(playerItem);
+                    continue;
+                }
+
                 if (i % 20 == 0 && i != 0) {
                     Optional<Holder.Reference<Item>> randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
                     randomItem.ifPresent(
