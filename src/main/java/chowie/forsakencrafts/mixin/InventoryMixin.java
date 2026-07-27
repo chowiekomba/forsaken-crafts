@@ -63,8 +63,10 @@ public class InventoryMixin {
 			}
 
 			if (!itemsUnlocked.contains(itemStack.getItem())) {
-				serverPlayer.sendSystemMessage(Component.literal(itemStack.getItemName().getString() +
-						" isn't unlocked yet!"));
+				if (!(serverPlayer.level().getServer().getPlayerList().getPlayer(serverPlayer.getUUID()) == null)) {
+					serverPlayer.sendSystemMessage(Component.literal(itemStack.getItemName().getString() +
+							" isn't unlocked yet!"));
+				}
 				itemStack.setCount(0);
 
 				if (!ForsakenCrafts.CONFIG.pickUpCommand.isEmpty()) {
@@ -89,18 +91,28 @@ public class InventoryMixin {
 			if (!itemsFound.contains(itemStack.getItem())) {
 				Optional<Holder.Reference<Item>> randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
 				if (randomItem.isPresent()) {
+					while (randomItem.get().is(ModItemTagProvider.UNOBTAINABLE_ITEMS) && !itemsUnlocked.contains(randomItem.get().value())) {
+						randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
+					}
 					Item item = randomItem.get().value();
 					itemsFound.add(itemStack.getItem());
 					itemsUnlocked.add(item);
 					serverPlayer.setAttached(ModDataAttachments.ITEMS_FOUND, itemsFound);
 					serverPlayer.setAttached(ModDataAttachments.ITEMS_UNLOCKED, itemsUnlocked);
 					ItemDisplayTimer.INSTANCE.setTimer(serverPlayer, item, 60);
+
+					if (!ForsakenCrafts.CONFIG.unlockCommand.isEmpty()) {
+						ConfigCommandExecuter.runCommand(serverPlayer.level().getServer(), ForsakenCrafts.CONFIG.unlockCommand,
+								serverPlayer);
+					}
 				}
 			}
 
 			if (!itemsUnlocked.contains(itemStack.getItem())) {
-				serverPlayer.sendSystemMessage(Component.literal(itemStack.getItemName().getString() +
-						" isn't unlocked yet!"));
+				if (!(serverPlayer.level().getServer().getPlayerList().getPlayer(serverPlayer.getUUID()) == null)) {
+					serverPlayer.sendSystemMessage(Component.literal(itemStack.getItemName().getString() +
+							" isn't unlocked yet!"));
+				}
 				itemStack.setCount(0);
                 ci.cancel();
 			}
