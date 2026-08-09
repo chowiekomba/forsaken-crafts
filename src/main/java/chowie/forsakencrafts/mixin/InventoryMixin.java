@@ -1,15 +1,12 @@
 package chowie.forsakencrafts.mixin;
 
 import chowie.forsakencrafts.ForsakenCrafts;
-import chowie.forsakencrafts.datagen.ModItemTagProvider;
 import chowie.forsakencrafts.util.ConfigCommandExecuter;
-import chowie.forsakencrafts.util.ItemDisplayTimer;
+import chowie.forsakencrafts.util.Helpers;
+import chowie.forsakencrafts.util.timer.ItemDisplayTimer;
 import chowie.forsakencrafts.util.ModDataAttachments;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -24,7 +21,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 @Mixin(Inventory.class)
 public class InventoryMixin {
@@ -37,29 +33,12 @@ public class InventoryMixin {
 	@Inject(method = "add(Lnet/minecraft/world/item/ItemStack;)Z", at = @At(value = "HEAD"), cancellable = true)
 	private void checkItemAdd(ItemStack itemStack, CallbackInfoReturnable<Boolean> cir) {
 		if (player instanceof ServerPlayer serverPlayer) {
-			List<Item> immutableItemsUnlocked = serverPlayer.getAttachedOrCreate(ModDataAttachments.ITEMS_UNLOCKED);
-			List<Item> immutableItemsFound = serverPlayer.getAttachedOrCreate(ModDataAttachments.ITEMS_FOUND);
+			List<Item> immutableItemsUnlocked = player.getAttachedOrCreate(ModDataAttachments.ITEMS_UNLOCKED);
+			List<Item> immutableItemsFound = player.getAttachedOrCreate(ModDataAttachments.ITEMS_FOUND);
 			List<Item> itemsUnlocked = new LinkedList<>(immutableItemsUnlocked);
-			List<Item> itemsFound = new LinkedList<>(immutableItemsFound);
 
-			if (!itemsFound.contains(itemStack.getItem())) {
-				Optional<Holder.Reference<Item>> randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
-				if (randomItem.isPresent()) {
-					while (randomItem.get().is(ModItemTagProvider.UNOBTAINABLE_ITEMS) && !itemsUnlocked.contains(randomItem.get().value())) {
-						randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
-					}
-					Item item = randomItem.get().value();
-					itemsFound.add(itemStack.getItem());
-					itemsUnlocked.add(item);
-					serverPlayer.setAttached(ModDataAttachments.ITEMS_FOUND, itemsFound);
-					serverPlayer.setAttached(ModDataAttachments.ITEMS_UNLOCKED, itemsUnlocked);
-					ItemDisplayTimer.INSTANCE.setTimer(serverPlayer, item, 60);
-
-					if (!ForsakenCrafts.CONFIG.unlockCommand.isEmpty()) {
-						ConfigCommandExecuter.runCommand(serverPlayer.level().getServer(), ForsakenCrafts.CONFIG.unlockCommand,
-								serverPlayer);
-					}
-				}
+			if (!immutableItemsFound.contains(itemStack.getItem())) {
+				ItemDisplayTimer.INSTANCE.setTimer(serverPlayer, Helpers.giveValidRandomItem(serverPlayer), 60);
 			}
 
 			if (!itemsUnlocked.contains(itemStack.getItem())) {
@@ -83,29 +62,12 @@ public class InventoryMixin {
 	@Inject(method = "setItem", at = @At(value = "HEAD"), cancellable = true)
 	private void checkHasItemUnlocked(int slot, ItemStack itemStack, CallbackInfo ci) {
 		if (player instanceof ServerPlayer serverPlayer) {
-			List<Item> immutableItemsUnlocked = serverPlayer.getAttachedOrCreate(ModDataAttachments.ITEMS_UNLOCKED);
-			List<Item> immutableItemsFound = serverPlayer.getAttachedOrCreate(ModDataAttachments.ITEMS_FOUND);
+			List<Item> immutableItemsUnlocked = player.getAttachedOrCreate(ModDataAttachments.ITEMS_UNLOCKED);
+			List<Item> immutableItemsFound = player.getAttachedOrCreate(ModDataAttachments.ITEMS_FOUND);
 			List<Item> itemsUnlocked = new LinkedList<>(immutableItemsUnlocked);
-			List<Item> itemsFound = new LinkedList<>(immutableItemsFound);
 
-			if (!itemsFound.contains(itemStack.getItem())) {
-				Optional<Holder.Reference<Item>> randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
-				if (randomItem.isPresent()) {
-					while (randomItem.get().is(ModItemTagProvider.UNOBTAINABLE_ITEMS) && !itemsUnlocked.contains(randomItem.get().value())) {
-						randomItem = BuiltInRegistries.ITEM.getRandom(RandomSource.create());
-					}
-					Item item = randomItem.get().value();
-					itemsFound.add(itemStack.getItem());
-					itemsUnlocked.add(item);
-					serverPlayer.setAttached(ModDataAttachments.ITEMS_FOUND, itemsFound);
-					serverPlayer.setAttached(ModDataAttachments.ITEMS_UNLOCKED, itemsUnlocked);
-					ItemDisplayTimer.INSTANCE.setTimer(serverPlayer, item, 60);
-
-					if (!ForsakenCrafts.CONFIG.unlockCommand.isEmpty()) {
-						ConfigCommandExecuter.runCommand(serverPlayer.level().getServer(), ForsakenCrafts.CONFIG.unlockCommand,
-								serverPlayer);
-					}
-				}
+			if (!immutableItemsFound.contains(itemStack.getItem())) {
+				ItemDisplayTimer.INSTANCE.setTimer(serverPlayer, Helpers.giveValidRandomItem(serverPlayer), 60);
 			}
 
 			if (!itemsUnlocked.contains(itemStack.getItem())) {
@@ -114,8 +76,14 @@ public class InventoryMixin {
 							" isn't unlocked yet!"));
 				}
 				itemStack.setCount(0);
+
+				if (!ForsakenCrafts.CONFIG.pickUpCommand.isEmpty()) {
+					ConfigCommandExecuter.runCommand(serverPlayer.level().getServer(), ForsakenCrafts.CONFIG.pickUpCommand,
+							serverPlayer);
+				}
                 ci.cancel();
 			}
+
 		}
 	}
 }

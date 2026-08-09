@@ -1,5 +1,6 @@
-package chowie.forsakencrafts.util;
+package chowie.forsakencrafts.util.timer;
 
+import chowie.forsakencrafts.util.PlayerItem;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
